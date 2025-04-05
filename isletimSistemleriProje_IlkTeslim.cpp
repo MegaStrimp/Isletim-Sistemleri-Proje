@@ -1,12 +1,3 @@
-/*
-İşletim Sistemleri Proje
-------------------------
-Anıl Berk Bakır
-Adviye Yılmazer
-Yusuf Maytalman
-Yusuf Diyar Kayır
-*/
-
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -36,8 +27,9 @@ class kontrolcu
 
     void rastgeleSurecOlustur(int adet)
     {
-        for (int i = 0; i < adet; ++i) {
-            surec surec(i,1 + rand() % 21);
+        for (int i = 0; i < adet; ++i)
+        {
+            surec surec(i,1 + rand() % 101);
             surecler.push_back(surec);
         }
     }
@@ -46,11 +38,16 @@ class kontrolcu
     {
         while (!surecler.empty())
         {
-            for (auto& secilenSurec:surecler)
+            for (auto i = surecler.begin(); i != surecler.end();)
             {
-                if (secilenSurec.girisZamani == zaman)
+                if (i->girisZamani == zaman)
                 {
-                    cout <<"zaman: "<<zaman<<" s: olay oldu."<<endl;
+                    cout<<"zaman: "<<zaman<<" s: olay oldu."<<endl;
+                    i = surecler.erase(i);
+                }
+                else
+                {
+                    ++i;
                 }
             }
             
@@ -61,13 +58,21 @@ class kontrolcu
 
 int main()
 {
-    srand(time(0));
+    cout<<"Isletim Sistemleri Proje - 1. Teslim"<<endl;
+    cout<<"------------------------------------"<<endl;
+    cout<<"Anil Berk Bakir"<<endl;
+    cout<<"Adviye Yilmazer"<<endl;
+    cout<<"Yusuf Maytalman"<<endl;
+    cout<<"Yusuf Diyar Kayir"<<endl<<endl;
 
+    srand(time(0));
+    
     kontrolcu kontrolcu;
 
     kontrolcu.rastgeleSurecOlustur(12);
     kontrolcu.surecleriIsle();
 
+    cout<<endl;
     cout<<"Cikmak Icin Enter'a Basin"<<endl;
     cin.ignore();
     
