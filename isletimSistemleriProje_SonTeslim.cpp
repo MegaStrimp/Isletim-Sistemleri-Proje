@@ -1,12 +1,3 @@
-/*
-İşletim Sistemleri Proje
-------------------------
-Anıl Berk Bakır
-Adviye Yılmazer
-Yusuf Maytalman
-Yusuf Diyar Kayır
-*/
-
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -27,14 +18,14 @@ class surec
     public:
     int ID;
     int girisZamani;
-    int kalanZaman;
-    int durum = hazir;
+    int calismaZamani;
+    int durum = surecDurumlari.hazir;
     
-    surec(int _ID,int _girisZamani,int _kalanZaman)
+    surec(int _ID,int _girisZamani,int _calismaZamani)
     {
         ID = _ID;
         girisZamani = _girisZamani;
-        kalanZaman = _kalanZaman;
+        calismaZamani = _calismaZamani;
     }
 };
 
@@ -42,12 +33,14 @@ class kontrolcu
 {
     public:
     int zaman = 0;
+    int calisanSurecID = -1;
     vector<surec> surecler;
 
     void rastgeleSurecOlustur(int adet)
     {
-        for (int i = 0; i < adet; ++i) {
-            surec surec(i,rand() % 21,1 + rand() % 10);
+        for (int i = 0; i < adet; ++i)
+        {
+            surec surec(i,1 + rand() % 101,1 + rand() % 15);
             surecler.push_back(surec);
         }
     }
@@ -56,21 +49,63 @@ class kontrolcu
     {
         while (!surecler.empty())
         {
-            for (auto& secilenSurec:surecler)
+            for (auto i = surecler.begin(); i != surecler.end();)
             {
-                if (secilenSurec.girisZamani == zaman)
+                if (i->girisZamani == zaman)
                 {
-                    cout <<"zaman: "<<zaman<<" s: olay oldu."<<endl;
+                    cout<<"zaman: "<<zaman<<" s: Surec "<<i<<"calismaya basladi"<<endl;
+                    i = surecler.erase(i);
+                }
+                else
+                {
+                    ++i;
                 }
             }
             
             zaman++;
         }
     }
+
+    void surecGeldi (int ID)
+    {
+        
+    }
+
+    void surecCikti (int ID)
+    {
+        
+    }
+
+    void surecCalismayaBasladi (int ID)
+    {
+        
+    }
+
+    void surecCalismayiBirakti (int ID)
+    {
+        
+    }
+
+    void surecGcİstedi(int ID)
+    {
+        
+    }
+
+    void gcBitti(int ID)
+    {
+        
+    }
 };
 
 int main()
 {
+    cout<<"Isletim Sistemleri Proje - Son Teslim"<<endl;
+    cout<<"------------------------------------"<<endl;
+    cout<<"Anil Berk Bakir"<<endl;
+    cout<<"Adviye Yilmazer"<<endl;
+    cout<<"Yusuf Maytalman"<<endl;
+    cout<<"Yusuf Diyar Kayir"<<endl<<endl;
+
     srand(time(0));
     
     kontrolcu kontrolcu;
@@ -78,8 +113,9 @@ int main()
     kontrolcu.rastgeleSurecOlustur(12);
     kontrolcu.surecleriIsle();
 
+    cout<<endl;
     cout<<"Cikmak Icin Enter'a Basin"<<endl;
     cin.ignore();
-
+    
     return 0;
 }
