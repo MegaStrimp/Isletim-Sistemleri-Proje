@@ -19,7 +19,7 @@ class surec
     int ID;
     int girisZamani;
     int calismaZamani;
-    int durum = surecDurumlari.hazir;
+    int durum = hazir;
     
     surec(int _ID,int _girisZamani,int _calismaZamani)
     {
@@ -53,7 +53,7 @@ class kontrolcu
             {
                 if (i->girisZamani == zaman)
                 {
-                    cout<<"zaman: "<<zaman<<" s: Surec "<<i<<"calismaya basladi"<<endl;
+                    cout<<"zaman: "<<zaman<<" s: Surec "<<i->ID<<" calismaya basladi"<<endl;
                     i = surecler.erase(i);
                 }
                 else
@@ -86,7 +86,7 @@ class kontrolcu
         
     }
 
-    void surecGcİstedi(int ID)
+    void surecGcIstedi(int ID)
     {
         
     }
@@ -105,6 +105,14 @@ int main()
     cout<<"Adviye Yilmazer"<<endl;
     cout<<"Yusuf Maytalman"<<endl;
     cout<<"Yusuf Diyar Kayir"<<endl<<endl;
+
+    /*
+    VSCode ile çalıştırmak için;
+    * Bu dosyayı terminalde açın
+    * Terminale "g++ -std=c++11 -o main isletimSistemleriProje_SonTeslim.cpp" komutunu girin
+    * Oluşan main.exe dosyasını açın
+    */
+    // g++ -std=c++11 -o main isletimSistemleriProje_SonTeslim.cpp
 
     srand(time(0));
     
