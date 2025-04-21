@@ -19,6 +19,7 @@ class surec
     int ID;
     int girisZamani;
     int calismaZamani;
+    int calistigiZaman;
     int gcZamani;
     int durum = hazir;
     
@@ -42,7 +43,7 @@ class kontrolcu
     {
         for (int i = 0; i < adet; ++i)
         {
-            surec surec(i,1 + rand() % 101,1 + rand() % 15);
+            surec surec(1 + i,1 + rand() % 101,1 + rand() % 15);
             surecler.push_back(surec);
         }
     }
@@ -53,14 +54,26 @@ class kontrolcu
         {
             for (auto i = surecler.begin(); i != surecler.end();)
             {
-                if (i->girisZamani == zaman)
+                if (calisanSurecID == -1)
                 {
-                    cout<<"zaman: "<<zaman<<" s: Surec "<<i->ID<<" calismaya basladi"<<endl;
-                    i = surecler.erase(i);
+                    surecCalismayaBasladi(surecler[rand() % surecler.size()]);
                 }
                 else
                 {
-                    ++i;
+                    if (i->ID == calisanSurecID)
+                    {
+                        if (i->girisZamani == zaman)
+                        {
+                            surecGeldi(*i);
+                            
+                            calisanSurecID = -1;
+                            i = surecler.erase(i);
+                        }
+                        else
+                        {
+                            ++i;
+                        }
+                    }
                 }
             }
             
@@ -68,34 +81,36 @@ class kontrolcu
         }
     }
 
-    void surecGeldi(int ID)
+    void surecGeldi(surec hedefSurec)
     {
-        
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" geldi."<<endl;
     }
 
-    void surecCikti(int ID)
+    void surecCikti(surec hedefSurec)
     {
-        
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" cikti."<<endl;
     }
 
-    void surecCalismayaBasladi(int ID)
+    void surecCalismayaBasladi(surec hedefSurec)
     {
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" calismaya basladi."<<endl;
         
+        calisanSurecID = hedefSurec.ID;
     }
 
-    void surecCalismayiBirakti(int ID)
+    void surecCalismayiBirakti(surec hedefSurec)
     {
-        
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" calismayi birakti."<<endl;
     }
 
-    void surecGcIstedi(int ID)
+    void surecGcIstedi(surec hedefSurec)
     {
-        
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" GC istedi."<<endl;
     }
 
-    void gcBitti(int ID)
+    void gcBitti(surec hedefSurec)
     {
-        
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" GC'yi bitirdi."<<endl;
     }
 };
 
@@ -120,7 +135,7 @@ int main()
     
     kontrolcu kontrolcu;
 
-    kontrolcu.rastgeleSurecOlustur(12);
+    kontrolcu.rastgeleSurecOlustur(2);
     kontrolcu.surecleriIsle();
 
     cout<<endl;
