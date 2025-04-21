@@ -19,6 +19,7 @@ class surec
     int ID;
     int girisZamani;
     int calismaZamani;
+    int gcZamani;
     int durum = hazir;
     
     surec(int _ID,int _girisZamani,int _calismaZamani)
@@ -26,6 +27,7 @@ class surec
         ID = _ID;
         girisZamani = _girisZamani;
         calismaZamani = _calismaZamani;
+        gcZamani = 1 + rand() % calismaZamani;
     }
 };
 
@@ -66,22 +68,22 @@ class kontrolcu
         }
     }
 
-    void surecGeldi (int ID)
+    void surecGeldi(int ID)
     {
         
     }
 
-    void surecCikti (int ID)
+    void surecCikti(int ID)
     {
         
     }
 
-    void surecCalismayaBasladi (int ID)
+    void surecCalismayaBasladi(int ID)
     {
         
     }
 
-    void surecCalismayiBirakti (int ID)
+    void surecCalismayiBirakti(int ID)
     {
         
     }
@@ -108,11 +110,11 @@ int main()
 
     /*
     VSCode ile çalıştırmak için;
+    * C/C++ extension indirin
     * Bu dosyayı terminalde açın
     * Terminale "g++ -std=c++11 -o main isletimSistemleriProje_SonTeslim.cpp" komutunu girin
     * Oluşan main.exe dosyasını açın
     */
-    // g++ -std=c++11 -o main isletimSistemleriProje_SonTeslim.cpp
 
     srand(time(0));
     
