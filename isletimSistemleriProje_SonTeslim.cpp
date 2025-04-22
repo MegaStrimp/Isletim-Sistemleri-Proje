@@ -36,47 +36,90 @@ class kontrolcu
 {
     public:
     int zaman = 0;
+    int kesmeSuresi = 3;
     int calisanSurecID = -1;
     vector<surec> surecler;
+    vector<surec> sistemdekiSurecler;
+    vector<surec> siradakiSurecler;
 
     void rastgeleSurecOlustur(int adet)
     {
         for (int i = 0; i < adet; ++i)
         {
-            surec surec(1 + i,1 + rand() % 101,1 + rand() % 15);
+            surec surec(1 + i,1 + rand() % 101,1 + rand() % 101);
             surecler.push_back(surec);
         }
     }
 
     void surecleriIsle()
     {
-        while (!surecler.empty())
+        while (!surecler.empty() || !(sistemdekiSurecler.empty()))
         {
             for (auto i = surecler.begin(); i != surecler.end();)
             {
-                if (calisanSurecID == -1)
+                if (i->girisZamani == zaman)
                 {
-                    surecCalismayaBasladi(surecler[rand() % surecler.size()]);
+                    surecGeldi(*i);
+
+                    sistemdekiSurecler.push_back(*i);
+                    i = surecler.erase(i);
                 }
                 else
                 {
-                    if (i->ID == calisanSurecID)
+                    ++i;
+                }
+            }
+
+            if (((calisanSurecID == -1) && (!sistemdekiSurecler.empty())) || ((sistemdekiSurecler.size() > 1) && (zaman % kesmeSuresi == 0)))
+            {
+                siradakiSurecler.clear();
+                for (auto& i : sistemdekiSurecler)
+                {
+                    if (i.ID != calisanSurecID) siradakiSurecler.push_back(i);
+                }
+                
+                if (calisanSurecID != -1)
+                {
+                    for (auto& i : sistemdekiSurecler)
                     {
-                        if (i->girisZamani == zaman)
+                        if (i.ID == calisanSurecID)
                         {
-                            surecGeldi(*i);
-                            
-                            calisanSurecID = -1;
-                            i = surecler.erase(i);
-                        }
-                        else
-                        {
-                            ++i;
+                            surecCalismayiBirakti(i);
+                            break;
                         }
                     }
                 }
+
+                surec& hedefSurec = siradakiSurecler[rand() % siradakiSurecler.size()];
+
+                surecCalismayaBasladi(hedefSurec);
             }
             
+            for (auto i = sistemdekiSurecler.begin(); i != sistemdekiSurecler.end();)
+            {
+                if (i->ID == calisanSurecID)
+                {
+                    i->calistigiZaman++;
+
+                    if (i->calistigiZaman >= i->calismaZamani)
+                    {
+                        surecCalismayiBirakti(*i);
+                        surecCikti(*i);
+
+                        calisanSurecID = -1;
+                        i = sistemdekiSurecler.erase(i);
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+
             zaman++;
         }
     }
@@ -135,7 +178,7 @@ int main()
     
     kontrolcu kontrolcu;
 
-    kontrolcu.rastgeleSurecOlustur(2);
+    kontrolcu.rastgeleSurecOlustur(12);
     kontrolcu.surecleriIsle();
 
     cout<<endl;
