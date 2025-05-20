@@ -133,7 +133,7 @@ class kontrolcu
                     if ((*i)->calistigiZaman == (*i)->gcZamani)
                     {
                         surecGcIstedi(*i);
-                        (*i)->gcBitisZamani = zaman + 1 + (rand() % 5);
+                        (*i)->gcBitisZamani = zaman + 2 + (rand() % 5);
                         
                         blokeSurecler.push_back(*i);
                         calisanSurecID = -1;
