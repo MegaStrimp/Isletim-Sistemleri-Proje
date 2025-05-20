@@ -19,11 +19,12 @@ class surec
     int ID;
     int girisZamani;
     int calismaZamani;
-    int calistigiZaman;
+    int calistigiZaman = 0;
     int gcZamani;
+    int gcBitisZamani;
     int durum = hazir;
-    
-    surec(int _ID,int _girisZamani,int _calismaZamani)
+
+    surec(int _ID, int _girisZamani, int _calismaZamani)
     {
         ID = _ID;
         girisZamani = _girisZamani;
@@ -36,31 +37,51 @@ class kontrolcu
 {
     public:
     int zaman = 0;
-    int kesmeSuresi = 3;
     int calisanSurecID = -1;
-    vector<surec> surecler;
-    vector<surec> sistemdekiSurecler;
-    vector<surec> siradakiSurecler;
+    int kesmeSuresi;
+
+    vector<surec*> surecler;
+    vector<surec*> sistemdekiSurecler;
+    vector<surec*> siradakiSurecler;
+    vector<surec*> blokeSurecler;
+
+    kontrolcu(int _kesmeSuresi)
+    {
+        kesmeSuresi = _kesmeSuresi;
+    }
 
     void rastgeleSurecOlustur(int adet)
     {
         for (int i = 0; i < adet; ++i)
         {
-            surec surec(1 + i,1 + rand() % 101,1 + rand() % 101);
-            surecler.push_back(surec);
+            surec *yeniSurec = new surec(1 + i, 1 + rand() % 101, kesmeSuresi + rand() % (kesmeSuresi * 10));
+            surecler.push_back(yeniSurec);
         }
     }
 
     void surecleriIsle()
     {
-        while (!surecler.empty() || !(sistemdekiSurecler.empty()))
+        while (!surecler.empty() || !sistemdekiSurecler.empty() || !blokeSurecler.empty())
         {
+            for (auto i = blokeSurecler.begin(); i != blokeSurecler.end();)
+            {
+                if (zaman >= (*i)->gcBitisZamani)
+                {
+                    gcBitti(*i);
+                    sistemdekiSurecler.push_back(*i);
+                    i = blokeSurecler.erase(i);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+
             for (auto i = surecler.begin(); i != surecler.end();)
             {
-                if (i->girisZamani == zaman)
+                if ((*i)->girisZamani == zaman)
                 {
                     surecGeldi(*i);
-
                     sistemdekiSurecler.push_back(*i);
                     i = surecler.erase(i);
                 }
@@ -73,16 +94,18 @@ class kontrolcu
             if (((calisanSurecID == -1) && (!sistemdekiSurecler.empty())) || ((sistemdekiSurecler.size() > 1) && (zaman % kesmeSuresi == 0)))
             {
                 siradakiSurecler.clear();
-                for (auto& i : sistemdekiSurecler)
+
+                for (auto &i:sistemdekiSurecler)
                 {
-                    if (i.ID != calisanSurecID) siradakiSurecler.push_back(i);
+                    if (i->ID != calisanSurecID)
+                        siradakiSurecler.push_back(i);
                 }
-                
+
                 if (calisanSurecID != -1)
                 {
-                    for (auto& i : sistemdekiSurecler)
+                    for (auto &i:sistemdekiSurecler)
                     {
-                        if (i.ID == calisanSurecID)
+                        if (i->ID == calisanSurecID)
                         {
                             surecCalismayiBirakti(i);
                             break;
@@ -90,29 +113,45 @@ class kontrolcu
                     }
                 }
 
-                surec& hedefSurec = siradakiSurecler[rand() % siradakiSurecler.size()];
-
-                surecCalismayaBasladi(hedefSurec);
+                if (!siradakiSurecler.empty())
+                {
+                    surec *hedefSurec = siradakiSurecler[rand() % siradakiSurecler.size()];
+                    surecCalismayaBasladi(hedefSurec);
+                }
+                else if (!sistemdekiSurecler.empty())
+                {
+                    surecCalismayaBasladi(sistemdekiSurecler[0]);
+                }
             }
-            
+
             for (auto i = sistemdekiSurecler.begin(); i != sistemdekiSurecler.end();)
             {
-                if (i->ID == calisanSurecID)
+                if ((*i)->ID == calisanSurecID)
                 {
-                    i->calistigiZaman++;
+                    (*i)->calistigiZaman++;
 
-                    if (i->calistigiZaman >= i->calismaZamani)
+                    if ((*i)->calistigiZaman == (*i)->gcZamani)
+                    {
+                        surecGcIstedi(*i);
+                        (*i)->gcBitisZamani = zaman + 1 + (rand() % 5);
+                        
+                        blokeSurecler.push_back(*i);
+                        calisanSurecID = -1;
+                        i = sistemdekiSurecler.erase(i);
+                        continue;
+                    }
+
+                    if ((*i)->calistigiZaman >= (*i)->calismaZamani)
                     {
                         surecCalismayiBirakti(*i);
                         surecCikti(*i);
-
                         calisanSurecID = -1;
+                        delete *i;
                         i = sistemdekiSurecler.erase(i);
+                        continue;
                     }
-                    else
-                    {
-                        ++i;
-                    }
+
+                    ++i;
                 }
                 else
                 {
@@ -124,36 +163,39 @@ class kontrolcu
         }
     }
 
-    void surecGeldi(surec hedefSurec)
+    void surecGeldi(surec *hedefSurec)
     {
-        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" geldi."<<endl;
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec->ID<<" geldi."<<endl;
     }
 
-    void surecCikti(surec hedefSurec)
+    void surecCikti(surec *hedefSurec)
     {
-        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" cikti."<<endl;
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec->ID<<" cikti."<<endl;
     }
 
-    void surecCalismayaBasladi(surec hedefSurec)
+    void surecCalismayaBasladi(surec *hedefSurec)
     {
-        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" calismaya basladi."<<endl;
-        
-        calisanSurecID = hedefSurec.ID;
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec->ID<<" calismaya basladi."<<endl;
+        calisanSurecID = hedefSurec->ID;
+        hedefSurec->durum = calisir;
     }
 
-    void surecCalismayiBirakti(surec hedefSurec)
+    void surecCalismayiBirakti(surec *hedefSurec)
     {
-        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" calismayi birakti."<<endl;
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec->ID<<" calismayi birakti."<<endl;
+        hedefSurec->durum = hazir;
     }
 
-    void surecGcIstedi(surec hedefSurec)
+    void surecGcIstedi(surec *hedefSurec)
     {
-        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" GC istedi."<<endl;
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec->ID<<" GC istedi."<<endl;
+        hedefSurec->durum = bloke;
     }
 
-    void gcBitti(surec hedefSurec)
+    void gcBitti(surec *hedefSurec)
     {
-        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec.ID<<" GC'yi bitirdi."<<endl;
+        cout<<"zaman: "<<zaman<<" s: Surec "<<hedefSurec->ID<<" GC'yi bitirdi."<<endl;
+        hedefSurec->durum = hazir;
     }
 };
 
@@ -166,24 +208,36 @@ int main()
     cout<<"Yusuf Maytalman"<<endl;
     cout<<"Yusuf Diyar Kayir"<<endl<<endl;
 
-    /*
-    VSCode ile çalıştırmak için;
-    * C/C++ extension indirin
-    * Bu dosyayı terminalde açın
-    * Terminale "g++ -std=c++11 -o main isletimSistemleriProje_SonTeslim.cpp" komutunu girin
-    * Oluşan main.exe dosyasını açın
-    */
-
     srand(time(0));
-    
-    kontrolcu kontrolcu;
 
-    kontrolcu.rastgeleSurecOlustur(12);
+    kontrolcu kontrolcu(3); //Kesme süresini 3 saniye olarak ayarladık. Sonraki çalışacak süreci rastgele seçiyor
+
+    kontrolcu.rastgeleSurecOlustur(2); //Daha fazla süreç sisteme girebilir ama biz varsayılan olarak 2 yaptık
     kontrolcu.surecleriIsle();
+
+    for (auto *i:kontrolcu.surecler)
+    {
+        delete i;
+    }
+
+    for (auto *i:kontrolcu.sistemdekiSurecler)
+    {
+        delete i;
+    }
+
+    for (auto *i:kontrolcu.siradakiSurecler)
+    {
+        delete i;
+    }
+
+    for (auto *i:kontrolcu.blokeSurecler)
+    {
+        delete i;
+    }
 
     cout<<endl;
     cout<<"Cikmak Icin Enter'a Basin"<<endl;
     cin.ignore();
-    
+
     return 0;
 }
