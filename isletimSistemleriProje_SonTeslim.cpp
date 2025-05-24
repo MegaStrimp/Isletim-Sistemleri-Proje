@@ -208,6 +208,14 @@ int main()
     cout<<"Yusuf Maytalman"<<endl;
     cout<<"Yusuf Diyar Kayir"<<endl<<endl;
 
+    /*
+    VSCode ile çalıştırmak için;
+    * C/C++ extension indirin
+    * Bu dosyayı terminalde açın
+    * Terminale "g++ -std=c++11 -o main isletimSistemleriProje_SonTeslim.cpp" komutunu girin
+    * Oluşan main.exe dosyasını açın
+    */
+
     srand(time(0));
 
     kontrolcu kontrolcu(3); //Kesme süresini 3 saniye olarak ayarladık. Sonraki çalışacak süreci rastgele seçiyor
